@@ -108,7 +108,7 @@ const ChooseUser = ({ visitor }) => {
                 <StyledTypography>
                   Student
                 </StyledTypography>
-                Login as a student to explore course materials and assignments.
+                Login as a student to explore course.
               </div>
             </StyledPaper>
           </Grid>
@@ -121,7 +121,7 @@ const ChooseUser = ({ visitor }) => {
                 <StyledTypography>
                   Teacher
                 </StyledTypography>
-                Login as a teacher to create courses, assignments, and track student progress.
+                Login as a teacher
               </div>
             </StyledPaper>
           </Grid>

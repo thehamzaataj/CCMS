@@ -1,16 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    studentsList: [],
-    studentDetails: null,
+    subjectsList: [],
+    subjectDetails: null,
     loading: false,
     error: null,
     response: null,
-    status: "idle"
 };
 
-const studentSlice = createSlice({
-    name: 'student',
+const subjectSlice = createSlice({
+    name: 'subject',
     initialState,
     reducers: {
         fetchStart: (state) => {
@@ -19,36 +18,31 @@ const studentSlice = createSlice({
         },
         fetchSuccess: (state, action) => {
             state.loading = false;
-            state.studentsList = Array.isArray(action.payload) ? action.payload : [];
+            state.subjectsList = action.payload;
             state.error = null;
         },
-        fetchStudentDetails: (state, action) => {
+        fetchSubjectDetails: (state, action) => {
             state.loading = false;
-            state.studentDetails = action.payload;
+            state.subjectDetails = action.payload;
             state.error = null;
         },
         fetchFailure: (state, action) => {
             state.loading = false;
             state.error = action.payload;
-            state.studentsList = [];
         },
         clearResponse: (state) => {
             state.response = null;
         },
-        underStudentControl: (state) => {
-            state.status = "idle";
-        }
     },
 });
 
 export const {
     fetchStart,
     fetchSuccess,
-    fetchStudentDetails,
+    fetchSubjectDetails,
     fetchFailure,
-    clearResponse,
-    underStudentControl
-} = studentSlice.actions;
+    clearResponse
+} = subjectSlice.actions;
 
-export const studentReducer = studentSlice.reducer;
-export default studentSlice.reducer;
+export const subjectReducer = subjectSlice.reducer;
+export default subjectSlice.reducer; 

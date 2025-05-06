@@ -21,10 +21,10 @@ const AddStudent = ({ situation }) => {
     const [password, setPassword] = useState('')
     const [className, setClassName] = useState('')
     const [sclassName, setSclassName] = useState('')
+    const [semester, setSemester] = useState('')
 
     const adminID = currentUser._id
     const role = "Student"
-    const attendance = []
 
     useEffect(() => {
         if (situation === "Class") {
@@ -53,18 +53,53 @@ const AddStudent = ({ situation }) => {
         }
     }
 
-    const fields = { name, rollNum, password, sclassName, adminID, role, attendance }
+    const validateFields = () => {
+        if (!name.trim()) {
+            setMessage("Name is required");
+            return false;
+        }
+        if (!rollNum) {
+            setMessage("Roll Number is required");
+            return false;
+        }
+        if (!password) {
+            setMessage("Password is required");
+            return false;
+        }
+        if (!sclassName) {
+            setMessage("Please select a class");
+            return false;
+        }
+        if (!semester) {
+            setMessage("Please enter semester");
+            return false;
+        }
+        if (semester < 1 || semester > 8) {
+            setMessage("Semester must be between 1 and 8");
+            return false;
+        }
+        return true;
+    }
 
     const submitHandler = (event) => {
         event.preventDefault()
-        if (sclassName === "") {
-            setMessage("Please select a classname")
-            setShowPopup(true)
+        if (!validateFields()) {
+            setShowPopup(true);
+            return;
         }
-        else {
-            setLoader(true)
-            dispatch(registerUser(fields, role))
+
+        const fields = { 
+            name: name.trim(), 
+            rollNum: parseInt(rollNum), 
+            password, 
+            sclassName, 
+            adminID, 
+            role,
+            semester: parseInt(semester)
         }
+
+        setLoader(true)
+        dispatch(registerUser(fields, role))
     }
 
     useEffect(() => {
@@ -87,11 +122,12 @@ const AddStudent = ({ situation }) => {
     return (
         <>
             <div className="register">
-                <form className="registerForm" onSubmit={submitHandler}>
+                <form className="registerForm" onSubmit={submitHandler} style={{backgroundColor: 'white', padding: '34px', borderRadius: '8px',  boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)'}}>
                     <span className="registerTitle">Add Student</span>
                     <label>Name</label>
                     <input className="registerInput" type="text" placeholder="Enter student's name..."
                         value={name}
+                        style={{ border: '1px solid black' }}
                         onChange={(event) => setName(event.target.value)}
                         autoComplete="name" required />
 
@@ -116,13 +152,26 @@ const AddStudent = ({ situation }) => {
                     <label>Roll Number</label>
                     <input className="registerInput" type="number" placeholder="Enter student's Roll Number..."
                         value={rollNum}
+                        style={{ border: '1px solid black' }}
                         onChange={(event) => setRollNum(event.target.value)}
+                        min="1"
+                        required />
+                    
+                    <label>Semester</label>
+                    <input className="registerInput" type="number" placeholder="Enter student's Semester..."
+                        value={semester}
+                        style={{ border: '1px solid black' }}
+                        onChange={(event) => setSemester(event.target.value)}
+                        min="1"
+                        max="8"
                         required />
 
                     <label>Password</label>
                     <input className="registerInput" type="password" placeholder="Enter student's password..."
                         value={password}
+                        style={{ border: '1px solid black' }}
                         onChange={(event) => setPassword(event.target.value)}
+                        minLength="6"
                         autoComplete="new-password" required />
 
                     <button className="registerButton" type="submit" disabled={loader}>
@@ -139,4 +188,4 @@ const AddStudent = ({ situation }) => {
     )
 }
 
-export default AddStudent
+export default AddStudent;

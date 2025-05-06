@@ -8,6 +8,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 const StudentSideBar = () => {
     const location = useLocation();
@@ -26,18 +27,12 @@ const StudentSideBar = () => {
                     </ListItemIcon>
                     <ListItemText primary="Subjects" />
                 </ListItemButton>
-                <ListItemButton component={Link} to="/Student/attendance">
-                    <ListItemIcon>
-                        <ClassOutlinedIcon color={location.pathname.startsWith("/Student/attendance") ? 'primary' : 'inherit'} />
-                    </ListItemIcon>
-                    <ListItemText primary="Attendance" />
-                </ListItemButton>
-                <ListItemButton component={Link} to="/Student/complain">
+                {/* <ListItemButton component={Link} to="/Student/complain">
                     <ListItemIcon>
                         <AnnouncementOutlinedIcon color={location.pathname.startsWith("/Student/complain") ? 'primary' : 'inherit'} />
                     </ListItemIcon>
                     <ListItemText primary="Complain" />
-                </ListItemButton>
+                </ListItemButton> */}
             </React.Fragment>
             <Divider sx={{ my: 1 }} />
             <React.Fragment>
@@ -45,10 +40,12 @@ const StudentSideBar = () => {
                     User
                 </ListSubheader>
                 <ListItemButton component={Link} to="/Student/profile">
-                    <ListItemIcon>
-                        <AccountCircleOutlinedIcon color={location.pathname.startsWith("/Student/profile") ? 'primary' : 'inherit'} />
-                    </ListItemIcon>
+                    <PersonOutlineIcon color={location.pathname.startsWith("/Student/profile") ? 'primary' : 'inherit'} />
                     <ListItemText primary="Profile" />
+                </ListItemButton>
+                <ListItemButton component={Link} to="/Student/marks">
+                    <ClassOutlinedIcon color={location.pathname.startsWith("/Student/marks") ? 'primary' : 'inherit'} />
+                    <ListItemText primary="Marks" />
                 </ListItemButton>
                 <ListItemButton component={Link} to="/logout">
                     <ListItemIcon>

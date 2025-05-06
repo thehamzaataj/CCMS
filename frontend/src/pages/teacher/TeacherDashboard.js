@@ -15,7 +15,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Logout from '../Logout'
 import AccountMenu from '../../components/AccountMenu';
 import { AppBar, Drawer } from '../../components/styles';
-import StudentAttendance from '../admin/studentRelated/StudentAttendance';
 
 import TeacherClassDetails from './TeacherClassDetails';
 import TeacherComplain from './TeacherComplain';
@@ -76,15 +75,14 @@ const TeacherDashboard = () => {
                     <Routes>
                         <Route path="/" element={<TeacherHomePage />} />
                         <Route path='*' element={<Navigate to="/" />} />
-                        <Route path="/Teacher/dashboard" element={<TeacherHomePage />} />
+                        <Route path="/Teacher" element={<TeacherHomePage />} />
                         <Route path="/Teacher/profile" element={<TeacherProfile />} />
 
                         <Route path="/Teacher/complain" element={<TeacherComplain />} />
 
-                        <Route path="/Teacher/class" element={<TeacherClassDetails />} />
+                        <Route path="/Teacher/class/:id" element={<TeacherClassDetails />} />
                         <Route path="/Teacher/class/student/:id" element={<TeacherViewStudent />} />
 
-                        <Route path="/Teacher/class/student/attendance/:studentID/:subjectID" element={<StudentAttendance situation="Subject" />} />
                         <Route path="/Teacher/class/student/marks/:studentID/:subjectID" element={<StudentExamMarks situation="Subject" />} />
 
                         <Route path="/logout" element={<Logout />} />

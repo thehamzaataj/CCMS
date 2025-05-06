@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { IconButton, Box, Menu, MenuItem, ListItemIcon, Tooltip } from '@mui/material';
+import { IconButton, Box, Menu, MenuItem, ListItemIcon, Tooltip,Typography } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -37,14 +37,14 @@ const ShowClasses = () => {
   const [message, setMessage] = useState("");
 
   const deleteHandler = (deleteID, address) => {
-    console.log(deleteID);
-    console.log(address);
-    setMessage("Sorry the delete function has been disabled for now.")
-    setShowPopup(true)
-    // dispatch(deleteUser(deleteID, address))
-    //   .then(() => {
-    //     dispatch(getAllSclasses(adminID, "Sclass"));
-    //   })
+    // console.log(deleteID);
+    // console.log(address);
+    // setMessage("Sorry the delete function has been disabled for now.")
+    // setShowPopup(true)
+    dispatch(deleteUser(deleteID, address))
+      .then(() => {
+        dispatch(getAllSclasses(adminID, "Sclass"));
+      })
   }
 
   const sclassColumns = [
@@ -118,8 +118,8 @@ const ShowClasses = () => {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          {actions.map((action) => (
-            <MenuItem onClick={action.action}>
+          {actions.map((action, index) => (
+            <MenuItem key={index} onClick={action.action}>
               <ListItemIcon fontSize="small">
                 {action.icon}
               </ListItemIcon>
@@ -149,11 +149,20 @@ const ShowClasses = () => {
         :
         <>
           {getresponse ?
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+            <Box sx={{ textAlign: 'center', marginTop: '16px' }}>
+            <Typography variant="h6" gutterBottom>
+              Add Your New Class
+            </Typography>
+            <Typography variant="body1" color="textSecondary" gutterBottom>
+              Use this section to create and manage new classes in the system. Ensure all details are accurate before submission.
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
               <GreenButton variant="contained" onClick={() => navigate("/Admin/addclass")}>
                 Add Class
               </GreenButton>
             </Box>
+          </Box>
+          
             :
             <>
               {Array.isArray(sclassesList) && sclassesList.length > 0 &&

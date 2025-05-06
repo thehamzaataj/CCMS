@@ -47,9 +47,9 @@ const StudentProfile = () => {
             </Grid>
             <Grid item xs={12}>
               <Box display="flex" justifyContent="center">
-                <Typography variant="subtitle1" component="p" textAlign="center">
+                {/* <Typography variant="subtitle1" component="p" textAlign="center">
                   School: {studentSchool.schoolName}
-                </Typography>
+                </Typography> */}
               </Box>
             </Grid>
           </Grid>

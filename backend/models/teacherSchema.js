@@ -7,8 +7,8 @@ const teacherSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        unique: true,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
@@ -21,29 +21,16 @@ const teacherSchema = new mongoose.Schema({
     school: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'admin',
-        required: true,
+        required: true
     },
     teachSubject: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'subject',
+        ref: 'subject'
     },
     teachSclass: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'sclass',
-        required: true,
-    },
-    attendance: [{
-        date: {
-            type: Date,
-            required: true
-        },
-        presentCount: {
-            type: String,
-        },
-        absentCount: {
-            type: String,
-        }
-    }]
+        ref: 'sclass'
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model("teacher", teacherSchema)

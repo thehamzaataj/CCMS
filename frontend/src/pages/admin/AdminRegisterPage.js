@@ -35,19 +35,17 @@ const AdminRegisterPage = () => {
         event.preventDefault();
 
         const name = event.target.adminName.value;
-        const schoolName = event.target.schoolName.value;
         const email = event.target.email.value;
         const password = event.target.password.value;
 
-        if (!name || !schoolName || !email || !password) {
+        if (!name || !email || !password) {
             if (!name) setAdminNameError(true);
-            if (!schoolName) setSchoolNameError(true);
             if (!email) setEmailError(true);
             if (!password) setPasswordError(true);
             return;
         }
 
-        const fields = { name, email, password, role, schoolName }
+        const fields = { name, email, password, role }
         setLoader(true)
         dispatch(registerUser(fields, role))
     };
@@ -92,7 +90,7 @@ const AdminRegisterPage = () => {
                             Admin Register
                         </Typography>
                         <Typography variant="h7">
-                            Create your own school by registering as an admin.
+                        Create your own course coordination space by registering as a coordinator.
                             <br />
                             You will be able to add students and faculty and
                             manage the system.
@@ -109,18 +107,6 @@ const AdminRegisterPage = () => {
                                 autoFocus
                                 error={adminNameError}
                                 helperText={adminNameError && 'Name is required'}
-                                onChange={handleInputChange}
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="schoolName"
-                                label="Create your school name"
-                                name="schoolName"
-                                autoComplete="off"
-                                error={schoolNameError}
-                                helperText={schoolNameError && 'School name is required'}
                                 onChange={handleInputChange}
                             />
                             <TextField

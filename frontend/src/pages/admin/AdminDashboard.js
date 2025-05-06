@@ -20,7 +20,6 @@ import AdminHomePage from './AdminHomePage';
 import AddStudent from './studentRelated/AddStudent';
 import SeeComplains from './studentRelated/SeeComplains';
 import ShowStudents from './studentRelated/ShowStudents';
-import StudentAttendance from './studentRelated/StudentAttendance';
 import StudentExamMarks from './studentRelated/StudentExamMarks';
 import ViewStudent from './studentRelated/ViewStudent';
 
@@ -73,7 +72,7 @@ const AdminDashboard = () => {
                             noWrap
                             sx={{ flexGrow: 1 }}
                         >
-                            Admin Dashboard
+                            Coordinator Dashboard
                         </Typography>
                         <AccountMenu />
                     </Toolbar>
@@ -94,7 +93,7 @@ const AdminDashboard = () => {
                     <Routes>
                         <Route path="/" element={<AdminHomePage />} />
                         <Route path='*' element={<Navigate to="/" />} />
-                        <Route path="/Admin/dashboard" element={<AdminHomePage />} />
+                        <Route path="/Admin" element={<AdminHomePage />} />
                         <Route path="/Admin/profile" element={<AdminProfile />} />
                         <Route path="/Admin/complains" element={<SeeComplains />} />
 
@@ -110,7 +109,6 @@ const AdminDashboard = () => {
                         <Route path="/Admin/addsubject/:id" element={<SubjectForm />} />
                         <Route path="/Admin/class/subject/:classID/:subjectID" element={<ViewSubject />} />
 
-                        <Route path="/Admin/subject/student/attendance/:studentID/:subjectID" element={<StudentAttendance situation="Subject" />} />
                         <Route path="/Admin/subject/student/marks/:studentID/:subjectID" element={<StudentExamMarks situation="Subject" />} />
 
                         {/* Class */}
@@ -122,9 +120,8 @@ const AdminDashboard = () => {
                         {/* Student */}
                         <Route path="/Admin/addstudents" element={<AddStudent situation="Student" />} />
                         <Route path="/Admin/students" element={<ShowStudents />} />
-                        <Route path="/Admin/students/student/:id" element={<ViewStudent />} />
-                        <Route path="/Admin/students/student/attendance/:id" element={<StudentAttendance situation="Student" />} />
-                        <Route path="/Admin/students/student/marks/:id" element={<StudentExamMarks situation="Student" />} />
+                        <Route path="/Admin/student/:id" element={<ViewStudent />} />
+                        <Route path="/Admin/subjects" element={<ViewSubject />} />
 
                         {/* Teacher */}
                         <Route path="/Admin/teachers" element={<ShowTeachers />} />

@@ -147,19 +147,12 @@ const ClassDetails = () => {
                     <PersonRemoveIcon color="error" />
                 </IconButton>
                 <BlueButton
+                style={{ marginRight: '16px' }}
                     variant="contained"
                     onClick={() => navigate("/Admin/students/student/" + row.id)}
                 >
                     View
                 </BlueButton>
-                <PurpleButton
-                    variant="contained"
-                    onClick={() =>
-                        navigate("/Admin/students/student/attendance/" + row.id)
-                    }
-                >
-                    Attendance
-                </PurpleButton>
             </>
         );
     };
@@ -192,7 +185,7 @@ const ClassDetails = () => {
                 ) : (
                     <>
                         <Typography variant="h5" gutterBottom>
-                            Students List:
+                            Probation Students List:
                         </Typography>
 
                         <TableTemplate buttonHaver={StudentsButtonHaver} columns={studentColumns} rows={studentRows} />
@@ -217,36 +210,51 @@ const ClassDetails = () => {
 
         return (
             <>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Class Details
-                </Typography>
-                <Typography variant="h5" gutterBottom>
-                    This is Class {sclassDetails && sclassDetails.sclassName}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Number of Subjects: {numberOfSubjects}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Number of Students: {numberOfStudents}
-                </Typography>
-                {getresponse &&
-                    <GreenButton
-                        variant="contained"
-                        onClick={() => navigate("/Admin/class/addstudents/" + classID)}
-                    >
-                        Add Students
-                    </GreenButton>
-                }
-                {response &&
-                    <GreenButton
-                        variant="contained"
-                        onClick={() => navigate("/Admin/addsubject/" + classID)}
-                    >
-                        Add Subjects
-                    </GreenButton>
-                }
+               <Box sx={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', marginTop: '31px' }}>
+  <Typography variant="h4" align="center" gutterBottom>
+    Class Details
+  </Typography>
+  <Typography variant="h5" gutterBottom fontWeight="bold">
+    {sclassDetails && sclassDetails.sclassName}
+  </Typography>
+  <Typography variant="h6" gutterBottom>
+    Number of Subjects: {numberOfSubjects}
+  </Typography>
+  <Typography variant="h6" gutterBottom>
+    Number of Students: {numberOfStudents}
+  </Typography>
+  {getresponse && (
+    <GreenButton
+      variant="contained"
+      style={{ marginRight: '16px' }}
+      onClick={() => navigate("/Admin/class/addstudents/" + classID)}
+    >
+      Add Students
+    </GreenButton>
+  )}
+  {response && (
+    <GreenButton
+      variant="contained"
+      onClick={() => navigate("/Admin/addsubject/" + classID)}
+    >
+      Add Subjects
+    </GreenButton>
+  )}
+</Box>
             </>
         );
+    }
+
+    const options = ['Provide Marks'];
+
+    const handleOptionClick = (option) => {
+        if (option === 'Provide Marks') {
+            handleMarks();
+        }
+    };
+
+    const handleMarks = (studentId) => {
+        navigate(`/Admin/class/student/marks/${studentId}/${classID}`)
     }
 
     return (

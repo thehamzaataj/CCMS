@@ -24,6 +24,7 @@ const AddTeacher = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('')
+  const [emailError, setEmailError] = useState('');
 
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState("");
@@ -36,24 +37,57 @@ const AddTeacher = () => {
 
   const fields = { name, email, password, role, school, teachSubject, teachSclass }
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const submitHandler = (event) => {
     event.preventDefault()
+    setEmailError('');
+    setMessage('');
+
+    if (!name || !email || !password) {
+      setMessage("Please fill in all fields")
+      setShowPopup(true)
+      return
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    if (!school || !teachSubject || !teachSclass) {
+      setMessage("Missing required information. Please try again.")
+      setShowPopup(true)
+      return
+    }
+
     setLoader(true)
     dispatch(registerUser(fields, role))
   }
 
   useEffect(() => {
     if (status === 'added') {
-      dispatch(underControl())
-      navigate("/Admin/teachers")
+      setMessage("Teacher registered successfully!")
+      setShowPopup(true)
+      setTimeout(() => {
+        dispatch(underControl())
+        navigate("/Admin/teachers")
+      }, 2000)
     }
     else if (status === 'failed') {
-      setMessage(response)
-      setShowPopup(true)
+      if (response && response.includes("already exists")) {
+        setEmailError("Email already exists. Please use a different email.");
+      } else {
+        setMessage(response || "Failed to add teacher")
+        setShowPopup(true)
+      }
       setLoader(false)
     }
     else if (status === 'error') {
-      setMessage("Network Error")
+      setMessage("Network Error. Please check your connection and try again.")
       setShowPopup(true)
       setLoader(false)
     }
@@ -78,10 +112,19 @@ const AddTeacher = () => {
             autoComplete="name" required />
 
           <label>Email</label>
-          <input className="registerInput" type="email" placeholder="Enter teacher's email..."
+          <input 
+            className={`registerInput ${emailError ? 'error' : ''}`} 
+            type="email" 
+            placeholder="Enter teacher's email..."
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email" required />
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setEmailError('');
+            }}
+            autoComplete="email" 
+            required 
+          />
+          {emailError && <span className="error-message">{emailError}</span>}
 
           <label>Password</label>
           <input className="registerInput" type="password" placeholder="Enter teacher's password..."

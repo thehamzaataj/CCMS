@@ -15,15 +15,11 @@ const {
     deleteStudents,
     deleteStudent,
     updateStudent,
-    studentAttendance,
     deleteStudentsByClass,
-    updateExamResult,
-    clearAllStudentsAttendanceBySubject,
-    clearAllStudentsAttendance,
-    removeStudentAttendanceBySubject,
-    removeStudentAttendance } = require('../controllers/student_controller.js');
+    updateExamResult
+} = require('../controllers/student_controller.js');
 const { subjectCreate, classSubjects, deleteSubjectsByClass, getSubjectDetail, deleteSubject, freeSubjectList, allSubjects, deleteSubjects } = require('../controllers/subject-controller.js');
-const { teacherRegister, teacherLogIn, getTeachers, getTeacherDetail, deleteTeachers, deleteTeachersByClass, deleteTeacher, updateTeacherSubject, teacherAttendance } = require('../controllers/teacher-controller.js');
+const { teacherRegister, teacherLogIn, getTeachers, getTeacherDetail, deleteTeachers, deleteTeachersByClass, deleteTeacher, updateTeacherSubject } = require('../controllers/teacher-controller.js');
 
 // Admin
 router.post('/AdminReg', adminRegister);
@@ -50,14 +46,6 @@ router.put("/Student/:id", updateStudent)
 
 router.put('/UpdateExamResult/:id', updateExamResult)
 
-router.put('/StudentAttendance/:id', studentAttendance)
-
-router.put('/RemoveAllStudentsSubAtten/:id', clearAllStudentsAttendanceBySubject);
-router.put('/RemoveAllStudentsAtten/:id', clearAllStudentsAttendance);
-
-router.put('/RemoveStudentSubAtten/:id', removeStudentAttendanceBySubject);
-router.put('/RemoveStudentAtten/:id', removeStudentAttendance)
-
 // Teacher
 
 router.post('/TeacherReg', teacherRegister);
@@ -71,8 +59,6 @@ router.delete("/TeachersClass/:id", deleteTeachersByClass)
 router.delete("/Teacher/:id", deleteTeacher)
 
 router.put("/TeacherSubject", updateTeacherSubject)
-
-router.post('/TeacherAttendance/:id', teacherAttendance)
 
 // Notice
 

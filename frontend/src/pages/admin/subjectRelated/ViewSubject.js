@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { getClassStudents, getSubjectDetails } from '../../../redux/sclassRelated/sclassHandle';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Tab, Container, Typography, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { Box, Tab, Container, Typography, BottomNavigation, BottomNavigationAction, Paper, ButtonGroup, Button, Popper, Grow, MenuList, MenuItem } from '@mui/material';
 import { BlueButton, GreenButton, PurpleButton } from '../../../components/buttonStyles';
 import TableTemplate from '../../../components/TableTemplate';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-
+import { ClickAwayListener } from '@mui/base';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import TableChartIcon from '@mui/icons-material/TableChart';
@@ -37,7 +38,7 @@ const ViewSubject = () => {
     setValue(newValue);
   };
 
-  const [selectedSection, setSelectedSection] = useState('attendance');
+  const [selectedSection, setSelectedSection] = useState('marks');
   const handleSectionChange = (event, newSection) => {
     setSelectedSection(newSection);
   };
@@ -55,41 +56,93 @@ const ViewSubject = () => {
     };
   })
 
-  const StudentsAttendanceButtonHaver = ({ row }) => {
-    return (
-      <>
-        <BlueButton
-          variant="contained"
-          onClick={() => navigate("/Admin/students/student/" + row.id)}
-        >
-          View
-        </BlueButton>
-        <PurpleButton
-          variant="contained"
-          onClick={() =>
-            navigate(`/Admin/subject/student/attendance/${row.id}/${subjectID}`)
-          }
-        >
-          Take Attendance
-        </PurpleButton>
-      </>
-    );
-  };
+  const StudentsButtonHaver = ({ row }) => {
+    const options = ['Provide Marks'];
 
-  const StudentsMarksButtonHaver = ({ row }) => {
+    const [open, setOpen] = React.useState(false);
+    const anchorRef = React.useRef(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
+
+    const handleClick = () => {
+        console.info(`You clicked ${options[selectedIndex]}`);
+        if (selectedIndex === 0) {
+            handleMarks();
+        }
+    };
+
+    const handleMarks = () => {
+        navigate(`/Admin/subject/student/marks/${row.id}/${subjectID}`)
+    }
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const handleMenuItemClick = (event, index) => {
+        setSelectedIndex(index);
+        setOpen(false);
+    };
+
     return (
-      <>
-        <BlueButton
-          variant="contained"
-          onClick={() => navigate("/Admin/students/student/" + row.id)}
-        >
-          View
-        </BlueButton>
-        <PurpleButton variant="contained"
-          onClick={() => navigate(`/Admin/subject/student/marks/${row.id}/${subjectID}`)}>
-          Provide Marks
-        </PurpleButton>
-      </>
+        <div>
+            <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
+                <Button onClick={handleClick}>{options[selectedIndex]}</Button>
+                <Button
+                    size="small"
+                    aria-controls={open ? 'split-button-menu' : undefined}
+                    aria-expanded={open ? 'true' : undefined}
+                    aria-label="select merge strategy"
+                    aria-haspopup="menu"
+                    onClick={handleToggle}
+                >
+                    <ArrowDropDownIcon />
+                </Button>
+            </ButtonGroup>
+            <Popper
+                sx={{
+                    zIndex: 1,
+                }}
+                open={open}
+                anchorEl={anchorRef.current}
+                role={undefined}
+                transition
+                disablePortal
+            >
+                {({ TransitionProps, placement }) => (
+                    <Grow
+                        {...TransitionProps}
+                        style={{
+                            transformOrigin:
+                                placement === 'bottom' ? 'center top' : 'center bottom',
+                        }}
+                    >
+                        <Paper>
+                            <ClickAwayListener onClickAway={handleClose}>
+                                <MenuList id="split-button-menu" autoFocusItem>
+                                    {options.map((option, index) => (
+                                        <MenuItem
+                                            key={option}
+                                            disabled={index === 2}
+                                            selected={index === selectedIndex}
+                                            onClick={(event) => handleMenuItemClick(event, index)}
+                                        >
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </MenuList>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Grow>
+                )}
+            </Popper>
+        </div>
     );
   };
 
@@ -113,24 +166,16 @@ const ViewSubject = () => {
               Students List:
             </Typography>
 
-            {selectedSection === 'attendance' &&
-              <TableTemplate buttonHaver={StudentsAttendanceButtonHaver} columns={studentColumns} rows={studentRows} />
-            }
             {selectedSection === 'marks' &&
-              <TableTemplate buttonHaver={StudentsMarksButtonHaver} columns={studentColumns} rows={studentRows} />
+              <TableTemplate buttonHaver={StudentsButtonHaver} columns={studentColumns} rows={studentRows} />
             }
 
             <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
               <BottomNavigation value={selectedSection} onChange={handleSectionChange} showLabels>
                 <BottomNavigationAction
-                  label="Attendance"
-                  value="attendance"
-                  icon={selectedSection === 'attendance' ? <TableChartIcon /> : <TableChartOutlinedIcon />}
-                />
-                <BottomNavigationAction
                   label="Marks"
                   value="marks"
-                  icon={selectedSection === 'marks' ? <InsertChartIcon /> : <InsertChartOutlinedIcon />}
+                  icon={selectedSection === 'marks' ? <TableChartIcon /> : <TableChartOutlinedIcon />}
                 />
               </BottomNavigation>
             </Paper>
@@ -156,7 +201,7 @@ const ViewSubject = () => {
           Subject Code : {subjectDetails && subjectDetails.subCode}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          Subject Sessions : {subjectDetails && subjectDetails.sessions}
+          Subject Semester : {subjectDetails && subjectDetails.sessions}
         </Typography>
         <Typography variant="h6" gutterBottom>
           Number of Students: {numberOfStudents}
@@ -208,4 +253,4 @@ const ViewSubject = () => {
   )
 }
 
-export default ViewSubject
+export default ViewSubject;

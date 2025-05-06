@@ -58,11 +58,12 @@ const Complain = require('../models/complainSchema.js');
 const adminRegister = async (req, res) => {
     try {
         const admin = new Admin({
-            ...req.body
+            ...req.body,
+            schoolName: req.body.schoolName || "Default School"
         });
 
         const existingAdminByEmail = await Admin.findOne({ email: req.body.email });
-        const existingSchool = await Admin.findOne({ schoolName: req.body.schoolName });
+        const existingSchool = await Admin.findOne({ schoolName: admin.schoolName });
 
         if (existingAdminByEmail) {
             res.send({ message: 'Email already exists' });

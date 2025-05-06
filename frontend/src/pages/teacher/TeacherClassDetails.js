@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getClassStudents } from "../../redux/sclassRelated/sclassHandle";
-import { Paper, Box, Typography, ButtonGroup, Button, Popper, Grow, ClickAwayListener, MenuList, MenuItem } from '@mui/material';
+import { Paper, Box, Typography, ButtonGroup, Button, Popper, Grow, ClickAwayListener, MenuList, MenuItem, CircularProgress } from '@mui/material';
 import { BlackButton, BlueButton} from "../../components/buttonStyles";
 import TableTemplate from "../../components/TableTemplate";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
@@ -11,18 +11,24 @@ import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 const TeacherClassDetails = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch();
+    const { id } = useParams();
     const { sclassStudents, loading, error, getresponse } = useSelector((state) => state.sclass);
-
     const { currentUser } = useSelector((state) => state.user);
-    const classID = currentUser.teachSclass?._id
-    const subjectID = currentUser.teachSubject?._id
+    const subjectID = currentUser.teachSubject?._id;
 
     useEffect(() => {
-        dispatch(getClassStudents(classID));
-    }, [dispatch, classID])
+        if (id) {
+            dispatch(getClassStudents(id));
+        }
+    }, [dispatch, id]);
 
     if (error) {
-        console.log(error)
+        console.error('Error loading class details:', error);
+        return (
+            <Box sx={{ p: 3 }}>
+                <Typography color="error">Error loading class details. Please try again.</Typography>
+            </Box>
+        );
     }
 
     const studentColumns = [
@@ -30,35 +36,28 @@ const TeacherClassDetails = () => {
         { id: 'rollNum', label: 'Roll Number', minWidth: 100 },
     ]
 
-    const studentRows = sclassStudents.map((student) => {
+    const studentRows = sclassStudents?.map((student) => {
         return {
             name: student.name,
             rollNum: student.rollNum,
             id: student._id,
         };
-    })
+    }) || [];
 
     const StudentsButtonHaver = ({ row }) => {
-        const options = ['Take Attendance', 'Provide Marks'];
-
+        const options = ['Provide Marks'];
         const [open, setOpen] = React.useState(false);
         const anchorRef = React.useRef(null);
         const [selectedIndex, setSelectedIndex] = React.useState(0);
 
         const handleClick = () => {
-            console.info(`You clicked ${options[selectedIndex]}`);
             if (selectedIndex === 0) {
-                handleAttendance();
-            } else if (selectedIndex === 1) {
                 handleMarks();
             }
         };
 
-        const handleAttendance = () => {
-            navigate(`/Teacher/class/student/attendance/${row.id}/${subjectID}`)
-        }
         const handleMarks = () => {
-            navigate(`/Teacher/class/student/marks/${row.id}/${subjectID}`)
+            navigate(`/Teacher/class/student/marks/${row.id}/${subjectID}`);
         };
 
         const handleMenuItemClick = (event, index) => {
@@ -74,16 +73,14 @@ const TeacherClassDetails = () => {
             if (anchorRef.current && anchorRef.current.contains(event.target)) {
                 return;
             }
-
             setOpen(false);
         };
+
         return (
             <>
                 <BlueButton
                     variant="contained"
-                    onClick={() =>
-                        navigate("/Teacher/class/student/" + row.id)
-                    }
+                    onClick={() => navigate("/Teacher/class/student/" + row.id)}
                 >
                     View
                 </BlueButton>
@@ -144,34 +141,42 @@ const TeacherClassDetails = () => {
     };
 
     return (
-        <>
+        <Box sx={{ p: 3 }}>
             {loading ? (
-                <div>Loading...</div>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+                    <CircularProgress />
+                </Box>
             ) : (
                 <>
                     <Typography variant="h4" align="center" gutterBottom>
                         Class Details
                     </Typography>
                     {getresponse ? (
-                        <>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                                No Students Found
-                            </Box>
-                        </>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+                            <Typography>No Students Found</Typography>
+                        </Box>
                     ) : (
-                        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                            <Typography variant="h5" gutterBottom>
-                                Students List:
-                            </Typography>
+                        <Paper sx={{ width: '100%', overflow: 'hidden', mt: 2 }}>
+                            <Box sx={{ p: 2 }}>
+                                <Typography variant="h5" gutterBottom>
+                                   Probation Students List:
+                                </Typography>
 
-                            {Array.isArray(sclassStudents) && sclassStudents.length > 0 &&
-                                <TableTemplate buttonHaver={StudentsButtonHaver} columns={studentColumns} rows={studentRows} />
-                            }
+                                {studentRows.length > 0 ? (
+                                    <TableTemplate 
+                                        buttonHaver={StudentsButtonHaver} 
+                                        columns={studentColumns} 
+                                        rows={studentRows} 
+                                    />
+                                ) : (
+                                    <Typography>No students found in this class.</Typography>
+                                )}
+                            </Box>
                         </Paper>
                     )}
                 </>
             )}
-        </>
+        </Box>
     );
 };
 

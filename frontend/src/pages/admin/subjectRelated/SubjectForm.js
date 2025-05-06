@@ -87,7 +87,7 @@ const SubjectForm = () => {
     }, [status, navigate, error, response, dispatch]);
 
     return (
-        <form onSubmit={submitHandler}>
+        <form onSubmit={submitHandler} style={{padding: '24px'}} >
             <Box mb={2}>
                 <Typography variant="h6" >Add Subjects</Typography>
             </Box>
@@ -119,7 +119,7 @@ const SubjectForm = () => {
                         <Grid item xs={4}>
                             <TextField
                                 fullWidth
-                                label="Sessions"
+                                label="Semester"
                                 variant="outlined"
                                 type="number"
                                 inputProps={{ min: 0 }}

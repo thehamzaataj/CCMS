@@ -1,6 +1,7 @@
 const Subject = require('../models/subjectSchema.js');
 const Teacher = require('../models/teacherSchema.js');
 const Student = require('../models/studentSchema.js');
+const Sclass = require('../models/sclassSchema.js');
 
 const subjectCreate = async (req, res) => {
     try {
@@ -91,28 +92,31 @@ const getSubjectDetail = async (req, res) => {
 const deleteSubject = async (req, res) => {
     try {
         const deletedSubject = await Subject.findByIdAndDelete(req.params.id);
+        if (!deletedSubject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
 
-        // Set the teachSubject field to null in teachers
-        await Teacher.updateOne(
-            { teachSubject: deletedSubject._id },
-            { $unset: { teachSubject: "" }, $unset: { teachSubject: null } }
+        // Remove the subject from all classes
+        await Sclass.updateMany(
+            { subjects: req.params.id },
+            { $pull: { subjects: req.params.id } }
         );
 
-        // Remove the objects containing the deleted subject from students' examResult array
+        // Remove the subject from all teachers
+        await Teacher.updateMany(
+            { teachSubject: req.params.id },
+            { $pull: { teachSubject: req.params.id } }
+        );
+
+        // Set examResult to null in all students
         await Student.updateMany(
-            {},
-            { $pull: { examResult: { subName: deletedSubject._id } } }
+            { examResult: { $elemMatch: { subName: req.params.id } } },
+            { $set: { examResult: null } }
         );
 
-        // Remove the objects containing the deleted subject from students' attendance array
-        await Student.updateMany(
-            {},
-            { $pull: { attendance: { subName: deletedSubject._id } } }
-        );
-
-        res.send(deletedSubject);
+        res.status(200).json({ message: "Subject deleted successfully" });
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -140,23 +144,29 @@ const deleteSubjects = async (req, res) => {
 
 const deleteSubjectsByClass = async (req, res) => {
     try {
-        const deletedSubjects = await Subject.deleteMany({ sclassName: req.params.id });
+        const { classId } = req.params;
 
-        // Set the teachSubject field to null in teachers
+        // Find all subjects in the class
+        const subjects = await Subject.find({ sclassName: classId });
+
+        // Delete all subjects
+        await Subject.deleteMany({ sclassName: classId });
+
+        // Remove subjects from all teachers
         await Teacher.updateMany(
-            { teachSubject: { $in: deletedSubjects.map(subject => subject._id) } },
-            { $unset: { teachSubject: "" }, $unset: { teachSubject: null } }
+            { teachSubject: { $in: subjects.map(subject => subject._id) } },
+            { $set: { teachSubject: [] } }
         );
 
-        // Set examResult and attendance to null in all students
+        // Set examResult to null in all students
         await Student.updateMany(
-            {},
-            { $set: { examResult: null, attendance: null } }
+            { examResult: { $elemMatch: { subName: { $in: subjects.map(subject => subject._id) } } } },
+            { $set: { examResult: null } }
         );
 
-        res.send(deletedSubjects);
+        res.status(200).json({ message: "Subjects deleted successfully" });
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({ message: error.message });
     }
 };
 

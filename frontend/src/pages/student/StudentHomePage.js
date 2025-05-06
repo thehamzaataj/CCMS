@@ -1,136 +1,109 @@
-import React, { useEffect, useState } from 'react'
-import { Container, Grid, Paper, Typography } from '@mui/material'
-import { useDispatch, useSelector } from 'react-redux';
-import { calculateOverallAttendancePercentage } from '../../components/attendanceCalculator';
-import CustomPieChart from '../../components/CustomPieChart';
-import { getUserDetails } from '../../redux/userRelated/userHandle';
-import styled from 'styled-components';
-import SeeNotice from '../../components/SeeNotice';
-import CountUp from 'react-countup';
-import Subject from "../../assets/subjects.svg";
-import Assignment from "../../assets/assignment.svg";
-import { getSubjectList } from '../../redux/sclassRelated/sclassHandle';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getNotices } from "../../redux/noticeRelated/noticeHandle";
+import { getSubjects } from "../../redux/subjectRelated/subjectHandle";
+import { getStudentDetails } from "../../redux/studentRelated/studentHandle";
+import { Paper, Box, Typography, Grid, Card, CardContent, CircularProgress, Alert } from '@mui/material';
 
 const StudentHomePage = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
-
-    const { userDetails, currentUser, loading, response } = useSelector((state) => state.user);
-    const { subjectsList } = useSelector((state) => state.sclass);
-
-    const [subjectAttendance, setSubjectAttendance] = useState([]);
-
-    const classID = currentUser.sclassName._id
+    const { currentUser } = useSelector((state) => state.user);
+    const { studentDetails, loading, error } = useSelector((state) => state.student);
+    const { noticesList } = useSelector((state) => state.notice);
+    const { subjectsList } = useSelector((state) => state.subject);
 
     useEffect(() => {
-        dispatch(getUserDetails(currentUser._id, "Student"));
-        dispatch(getSubjectList(classID, "ClassSubjects"));
-    }, [dispatch, currentUser._id, classID]);
-
-    const numberOfSubjects = subjectsList && subjectsList.length;
-
-    useEffect(() => {
-        if (userDetails) {
-            setSubjectAttendance(userDetails.attendance || []);
+        if (currentUser?._id) {
+            dispatch(getStudentDetails(currentUser._id));
+            dispatch(getNotices(currentUser._id));
+            dispatch(getSubjects(currentUser._id));
         }
-    }, [userDetails])
+    }, [currentUser?._id, dispatch]);
 
-    const overallAttendancePercentage = calculateOverallAttendancePercentage(subjectAttendance);
-    const overallAbsentPercentage = 100 - overallAttendancePercentage;
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
-    const chartData = [
-        { name: 'Present', value: overallAttendancePercentage },
-        { name: 'Absent', value: overallAbsentPercentage }
-    ];
+    if (error) {
+        return (
+            <Box sx={{ p: 3 }}>
+                <Alert severity="error">{error}</Alert>
+            </Box>
+        );
+    }
+
     return (
-        <>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Subject} alt="Subjects" />
-                            <Title>
-                                Total Subjects
-                            </Title>
-                            <Data start={0} end={numberOfSubjects} duration={2.5} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Assignment} alt="Assignments" />
-                            <Title>
-                                Total Assignments
-                            </Title>
-                            <Data start={0} end={15} duration={4} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={4} lg={3}>
-                        <ChartContainer>
-                            {
-                                response ?
-                                    <Typography variant="h6">No Attendance Found</Typography>
-                                    :
-                                    <>
-                                        {loading
-                                            ? (
-                                                <Typography variant="h6">Loading...</Typography>
-                                            )
-                                            :
-                                            <>
-                                                {
-                                                    subjectAttendance && Array.isArray(subjectAttendance) && subjectAttendance.length > 0 ? (
-                                                        <>
-                                                            <CustomPieChart data={chartData} />
-                                                        </>
-                                                    )
-                                                        :
-                                                        <Typography variant="h6">No Attendance Found</Typography>
-                                                }
-                                            </>
-                                        }
-                                    </>
-                            }
-                        </ChartContainer>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                            <SeeNotice />
-                        </Paper>
-                    </Grid>
+        <Box sx={{ p: 3 }}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                    <Paper sx={{ p: 3 }}>
+                        <Typography variant="h4" gutterBottom>
+                            Welcome, {studentDetails?.name || 'Student'}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Roll Number: {studentDetails?.rollNum}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Class: {studentDetails?.sclassName?.sclassName || 'N/A'}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Semester: {studentDetails?.semester || 'N/A'}
+                        </Typography>
+                    </Paper>
                 </Grid>
-            </Container>
-        </>
-    )
-}
+                <Grid item xs={12} md={6}>
+                    <Paper sx={{ p: 3 }}>
+                        <Typography variant="h5" gutterBottom>
+                            Recent Notices
+                        </Typography>
+                        {noticesList?.length > 0 ? (
+                            noticesList.map((notice) => (
+                                <Card key={notice._id} sx={{ mb: 2 }}>
+                                    <CardContent>
+                                        <Typography variant="h6">{notice.title}</Typography>
+                                        <Typography variant="body2">{notice.details}</Typography>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : (
+                            <Typography>No notices available</Typography>
+                        )}
+                    </Paper>
+                </Grid>
+                <Grid item xs={12}>
+                    <Paper sx={{ p: 3 }}>
+                        <Typography variant="h5" gutterBottom>
+                            Your Subjects
+                        </Typography>
+                        <Grid container spacing={2}>
+                            {subjectsList?.length > 0 ? (
+                                subjectsList.map((subject) => (
+                                    <Grid item xs={12} sm={6} md={4} key={subject._id}>
+                                        <Card>
+                                            <CardContent>
+                                                <Typography variant="h6">{subject.subName}</Typography>
+                                                <Typography variant="body2">
+                                                    Teacher: {subject.teacher?.name || 'N/A'}
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))
+                            ) : (
+                                <Typography>No subjects available</Typography>
+                            )}
+                        </Grid>
+                    </Paper>
+                </Grid>
+            </Grid>
+        </Box>
+    );
+};
 
-const ChartContainer = styled.div`
-  padding: 2px;
-  display: flex;
-  flex-direction: column;
-  height: 240px;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-`;
-
-const StyledPaper = styled(Paper)`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  height: 200px;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
-`;
-
-const Title = styled.p`
-  font-size: 1.25rem;
-`;
-
-const Data = styled(CountUp)`
-  font-size: calc(1.3rem + .6vw);
-  color: green;
-`;
-
-
-
-export default StudentHomePage
+export default StudentHomePage;
